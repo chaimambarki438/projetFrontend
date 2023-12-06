@@ -1,3 +1,5 @@
+import { ListeBibliothequesComponent } from './../liste-bibliotheques/liste-bibliotheques.component';
+
 import { Component, OnInit } from '@angular/core';
 import { Livre } from '../model/livre.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -21,34 +23,13 @@ export class UpdateLivreComponent implements OnInit {
 isImageUpdated: Boolean=false;
 
 
-
-
-  
-
-
 constructor(private activatedRoute: ActivatedRoute,
             private livreService: LivreService,
             private router :Router,
             ) { }
 
-/*ngOnInit():void {
-//this.bibliotheques=this.livreService.listeBiblitheques();
-this.livreService.listeBiblitheques().
-subscribe(cats => {this.bibliotheques= cats._embedded.bibliotheques;
-console.log(cats);
-});
 
-this.livreService.consulterLivre(this.activatedRoute.snapshot. params['id']).
-    subscribe( prod =>{ this.currentLivre = prod;
-      this.updatedBibId = this.currentLivre.bibliotheque.idBib;
-      });
-this.livreService.loadImage(this.currentLivre.image.idImage)
-  .subscribe((img: Image) => {
-  this.myImage = 'data:' + img.type + ';base64,' + img.image;
-  }); 
-} 
-*/
-ngOnInit(): void {
+ngOnInit(){
   this.livreService.listeBiblitheques().
   subscribe(cats => {this.bibliotheques= cats._embedded.bibliotheques;
     console.log(cats);
@@ -56,47 +37,45 @@ ngOnInit(): void {
   this.livreService.consulterLivre(this.activatedRoute.snapshot.params['id'])
   .subscribe( prod =>{ this.currentLivre = prod;
   this.updatedBibId = prod.bibliotheque.idBib;
-  } ) ;
 
-  
-
-  
+  this.loadLastImage();
+   });
 
   }
 
+
+  loadLastImage() {
+    if (this.currentLivre.images && this.currentLivre.images.length > 0) {
+      // Tri des images par idImage
+      this.currentLivre.images.sort((a, b) => b.idImage - a.idImage);
+      const lastImage = this.currentLivre.images[0];
+      this.loadImage(lastImage.idImage);
+    }
+  }
+
+  loadImage(imageId: number) {
+    this.livreService.loadImage(imageId)
+      .subscribe((img: Image) => {
+        this.myImage = 'data:' + img.type + ';base64,' + img.image;
+      });
+  }
+ 
 
 
 updateLivre()
 {
   this.currentLivre.bibliotheque = this.bibliotheques.find(cat => cat.idBib == this.updatedBibId)!;
-//this.currentLivre.bibliotheque=this.livreService.consulterBibliotheque(this.updatedBibId);
 
-  //tester si l'image du produit a été modifiée
-  // if (this.isImageUpdated)
-  // { 
-  // this.livreService.uploadImage(this.uploadedImage, this.uploadedImage.name)
-  // .subscribe((img: Image) => {
-  // this.currentLivre.image = img;
-  
-this.livreService.updateLivre(this.currentLivre).subscribe(prod => {
-  this.livreService
-               .uploadImageFS(this.uploadedImage,
-                 this.uploadedImage.name, prod.idLivre!)
-               .subscribe((response: any) => { }
-               );
-  this.router.navigate(['livres']);
-  });
- 
-    }
+  this.livreService.updateLivre(this.currentLivre).subscribe(prod => {
 
+           this.router.navigate(['livres']);
   
+});
+
+      }
+     
 //image
 
-
- 
-
- 
- 
 
 
 onImageUpload(event: any) {
@@ -105,35 +84,40 @@ onImageUpload(event: any) {
   this.isImageUpdated =true;
   const reader = new FileReader();
   reader.readAsDataURL(this.uploadedImage);
-  reader.onload = (_event) => { this.myImage = reader.result as string; };
-  
+  reader.onload = () => { this.myImage = reader.result as string; };
   }
-  }
+}
 
-  onAddImageLivre(){
+onAddImageLivre(){
     this.livreService
     .uploadImageLivr(this.uploadedImage,this.uploadedImage.name,this.currentLivre.idLivre!)
         .subscribe( (img : Image) => {
               this.currentLivre.images.push(img);
-           });
-  }
+             });
+}
+  
 
-  supprimerImage(img: Image) {
+ 
+
+  supprimerImage(img: Image){
     let conf = confirm("Etes-vous sûr ?");
     if (conf)
-      this.livreService.supprimerImage(img.idImage).subscribe(() => {
-        //supprimer image du tableau currentProduit.images 
-        const index = this.currentLivre.images.indexOf(img, 0);
-        if (index > -1) {
-          this.currentLivre.images.splice(index, 1);
-        }
-      });
+    this.livreService.supprimerImage(img.idImage).subscribe(() => {
+    //supprimer image du tableau currentProduit.images 
+    const index = this.currentLivre.images.indexOf(img, 0);
+    if (index > -1) {
+    this.currentLivre.images.splice(index, 1);
+    }
+    });
+    }
+    
+   
+  
+    
   }
 
 
 
 
-
-}
 
 

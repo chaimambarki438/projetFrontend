@@ -1,40 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            padding-top: 56px;
+        }
+
+        .navbar {
+            background-color: #232f3e;
+        }
+
+        .navbar-dark .navbar-nav .nav-link {
+            color: #ffffff;
+        }
+
+        .jumbotron {
+            background-image: url('https://placekitten.com/1600/600'); /* Image de fond de la bannière */
+            color: #ffffff;
+            text-align: center;
+            padding: 100px 0;
+            margin-bottom: 0;
+        }
+
+        .product-card {
+            border: 1px solid #dee2e6;
+            margin: 10px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Livres populaires -->
 <div class="container">
-    <div class="card shadow mb-4">
-    <div class="card-body">
-    <table class="table table-striped">
-    
-    <tr>
-    <th>Liste de Livres</th>
-    </tr>
-
-    <tr> <th>Id</th>
-        <th>Titre</th>
-         <th>Prix</th>
-          <th>Date Ouverture</th>
-          <th>Bibliotheque</th>
-           <th>Image</th>
- </tr>
-<tbody *ngFor="let livre of livres">
-<tr >
-<td>{{livre.idLivre}}</td>
-<td>{{livre.titreLivre}}</td>
-<td>{{livre.prixLivre}}</td>
-<td>{{livre.dateOuverture| date:'dd/MM/yyyy'}}</td>
-<td>{{livre.bibliotheque!.nomBib}}</td>
-
-<td><img class="card-img-top img-responsive"
-    src="{{apiurl+'/image/loadfromFS/'+livre.idLivre}}"
-    style = "height :50px;width:100px">
-    </td>
-
-    
-<td><a *ngIf="authService.isAdmin()" class="btn btn-danger" (click)="supprimerLivre(livre)">Supprimer</a></td>
-<td><a *ngIf="authService.isAdmin()" class="btn btn-success" [routerLink]="['/updateLivre',livre.idLivre]">Modifier</a></td>
- 
-</tr>
-</tbody>
-
-    </table>
-    </div>
+    <h2>Liste Livres</h2>
+    <div class="col">
+        <div class="row-md-4" *ngFor="let livre of livres">
+            <div class="product-card">
+                <div class="row">
+                    <img class="card-img-top img-responsive m-3" 
+                    src="{{livre.imageStr}}"
+                    style="height:300px; width:200px;">
+                    
+                    <div class="row-md-4 m-3" >  <!-- Ajout de la classe m-3 pour la marge -->
+                        <h3>{{livre.titreLivre}}</h3>
+                        <p class="text-center">{{livre.prixLivre}} Dinar</p>
+                        <p class="text-center">{{livre.dateOuverture| date:'dd/MM/yyyy'}}</p>
+                        <p class="text-center">
+                            <img alt="" src="https://m.media-amazon.com/images/I/111mHoVK0kL._SS200_.png" class="s-image" height="18px" width="18px">{{livre.bibliotheque!.nomBib}}
+                        </p>
+                        <div class="d-flex  justify-content-around" class="text-center" *ngIf="authService.isAdmin()"> <!-- Ajout de la classe my-1 pour une marge minimale -->
+                            <button class="btn btn-danger" style="background-color: #dc3545; border-color: #dc3545;">
+                            <a  (click)="supprimerLivre(livre)">
+                                    <img src="/assets/images/img/delete.png" height="32" width="32">
+                                </a>
+                            
+                            </button>
+                            <button class="btn btn-success" style="background-color: #28a745; border-color: #28a745;" *ngIf="authService.isAdmin()">
+                                <a *ngIf="authService.isAdmin()" [routerLink]="['/updateLivre',livre.idLivre]">
+                                    <img src="/assets/images/img/edit.png" height="32" width="32">
+                                </a>
+                            </button>
+                        </div>
+                        
+                    </div>
+                </div> 
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>

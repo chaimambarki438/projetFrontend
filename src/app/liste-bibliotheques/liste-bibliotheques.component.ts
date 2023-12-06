@@ -1,4 +1,6 @@
+import { Router } from '@angular/router';
 import { Bibliotheque } from '../model/bibliotheque.model';
+import { AuthService } from '../services/auth.service';
 import { LivreService } from '../services/livre.service';
 import { BibliothequeWrapper } from './../model/bibliothequeWrapped.model';
 import { Component, OnInit } from '@angular/core';
@@ -15,12 +17,20 @@ export class ListeBibliothequesComponent implements OnInit {
   updatedBib:Bibliotheque = {"idBib":0,"nomBib":""};
   ajout:boolean=true;
   
-  constructor(private livreService : LivreService) { }
+  constructor(private livreService : LivreService,
+    public authService: AuthService,
+      private router :Router) { }
 
   ngOnInit(): void {
     this.chargerBibliotheque();
+    this.authService.loadToken();
+    if (this.authService.getToken()==null ||
+     this.authService.isTokenExpired())
+     this.router.navigate(['/login']);
   }
-
+  onLogout(){
+    this.authService.logout();
+  }
 
 
   bibliothequeUpdated(bib:Bibliotheque){
@@ -44,16 +54,14 @@ export class ListeBibliothequesComponent implements OnInit {
         this.ajout=false; 
         }
   
-  // supprimerBibliotheque(bib: Bibliotheque) {
-  //         let conf = confirm("Etes-vous sûr ?");
-  //            if (conf)
-  //            {
-  //              this.livreService.supprimerLivre(bib.idBib!).subscribe(() => {
-  //               console.log("Bibliotheque supprimée");
-  //               this.chargerBibliotheque(); }  );
-  //            }
-  //        }
-        
-         
-   
+  supprimerBib(bib:Bibliotheque) {
+          let conf = confirm("Etes-vous sûr ?");
+          if (conf) {
+            this.livreService.supprimerBib(bib.idBib).subscribe(() => {
+              console.log("Bibliotheque supprimé");
+            this.chargerBibliotheque();
+            });
+          }
+        }  
+ 
         }

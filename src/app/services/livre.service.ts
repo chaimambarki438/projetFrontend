@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { BibliothequeWrapper } from '../model/bibliothequeWrapped.model';
 import { AuthService } from './auth.service';
 import { Image } from '../model/image.model';
+import { Byte } from '@angular/compiler/src/util';
 
 
 const httpOptions = {
@@ -16,8 +17,8 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class LivreService {
-  apiURLCat: string = 'http://localhost:8085/livres/cat';
-  apiURL: string = 'http://localhost:8085/livres/api';
+  apiURLCat: string = 'http://localhost:8089/livres/cat';
+  apiURL: string = 'http://localhost:8089/livres/api';
   livres! : Livre[]; 
   livre!:Livre;
   //bibliotheques :Bibliotheque[];
@@ -51,7 +52,7 @@ listeLivres(): Observable<Livre[]>
  
    
   }
-
+  
 ajouterLivre(prod:Livre): Observable<Livre>
   { 
     let jwt = this.authService.getToken();
@@ -59,6 +60,7 @@ ajouterLivre(prod:Livre): Observable<Livre>
     let httpHeaders = new HttpHeaders({"Authorization":jwt}) 
     return this.http.post<Livre>(this.apiURL+"/addlivr", prod, {headers:httpHeaders})
   }
+ 
 
 supprimerLivre(id : number) {
   const url = `${this.apiURL}/dellivr/${id}`;
@@ -66,6 +68,11 @@ supprimerLivre(id : number) {
   jwt = "Bearer"+jwt;
   let httpHeaders = new HttpHeaders({"Authorization":jwt}) 
   return this.http.delete(url, {headers:httpHeaders});
+  }
+///supprimer livre avec tous l'image///
+  supprimerLivreAvecImages(idLivre: number): Observable<void> {
+    const url = `${this.apiURL}/${idLivre}/supprimerAvecImages`;
+    return this.http.delete<void>(url);
   }
 
 consulterLivre(id: number): Observable<Livre> {
@@ -127,34 +134,51 @@ rechercherParTitre(titre: string):Observable< Livre[]> {
   return this.http.post<Bibliotheque>(this.apiURLCat, bib, httpOptions);
   }
 
-  /*supprimerBibliotheque(id : number) {
-    const url =`${this.apiURLCat}/delBib/${id}`;
-    return this.http.delete(url, httpOptions)
-  }
-*/
- 
-  //image
-uploadImage(file: File, filename: string): Observable<Image>{
+  supprimerBib(id : number) {
+    let jwt = this.authService.getToken();
+    jwt = "Bearer"+jwt;
+    let httpHeaders = new HttpHeaders({"Authorization":jwt}) 
+    const url = `${this.apiURLCat}/${id}`;
+    return this.http.delete(url, {headers:httpHeaders});
+    } 
+  
+  //image modifier
+  uploadImage(file: File, filename: string): Observable<Image>{
     const imageFormData = new FormData();
     imageFormData.append('image', file, filename);
     const url = `${this.apiURL + '/image/upload'}`;
     return this.http.post<Image>(url, imageFormData);
     }
 
-loadImage(id: number): Observable<Image> {
+  loadImage(id: number): Observable<Image> {
     const url = `${this.apiURL + '/image/get/info'}/${id}`;
     return this.http.get<Image>(url);
     }
 
+    
+///////
 
+   /* loadImageFS(id: number):Observable <number[]> {
+      const url = `${this.apiURL + '/image/loadfromFS'}/${id}`;
+      return this.http.get<number[]>(url);
+      }
 
+*/
 uploadImageLivr(file: File, filename: string, idLivr:number): Observable<any>{
       const imageFormData = new FormData();
       imageFormData.append('image', file, filename);
       const url = `${this.apiURL + '/image/uplaodImageLivr'}/${idLivr}`;
       return this.http.post(url, imageFormData);
    }
-      
+
+
+   addImageLivr(file: File, filename: string, idLivr:number): Observable<any>{
+    const imageFormData = new FormData();
+    imageFormData.append('image', file, filename);
+    const url = `${this.apiURL + '/image/ImageLivr'}/${idLivr}`;
+    return this.http.post(url, imageFormData);
+ }
+   ////   
    supprimerImage(id : number) {
     const url = `${this.apiURL}/image/delete/${id}`;
     return this.http.delete(url, httpOptions);
@@ -168,7 +192,13 @@ uploadImageLivr(file: File, filename: string, idLivr:number): Observable<any>{
       return this.http.post(url, imageFormData);
     }
 
-   
+    uploadImages(images: FileList): Observable<Image[]> {
+      const formData = new FormData();
+      for (let i = 0; i < images.length; i++) {
+        formData.append('images', images[i]);
+      }
+      return this.http.post<Image[]>(`${this.apiURL}/uploadImages`, formData);
+    }  
       
 
 }

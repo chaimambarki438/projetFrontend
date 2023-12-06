@@ -28,6 +28,12 @@
 </select>
 </div>
 
+
+
+ 
+
+
+
 <div class="col-sm-16 col-md-16 col-lg-16">
     <label class="mb-2">Image :</label>
     <input type="file" (change)="onImageUpload($event)" class="form-control">
@@ -37,9 +43,7 @@
     <button type="submit" (click)="onAddImageLivre()" class="btn 
     btn-success">Ajouter Image</button>
 </div>
-    
-
-
+                
 <div class="col-sm-16 col-md-16 col-lg-16">
     <img [src]="myImage" class="card-img-top img-fluid rounded-start"
     style="width: 500px; height: 300px" />
@@ -65,11 +69,10 @@
             </table>
         </div>
     </div>
-               
+            
 
 <div class="mt-2">
-<button type="submit" (click)="updateLivre()" class="btn btn-success">Modifer</button>
+    <button type="button" (click)="updateLivre()" class="btn btn-success">Modifier</button>
 </div>
 </form>
 </div>
-    

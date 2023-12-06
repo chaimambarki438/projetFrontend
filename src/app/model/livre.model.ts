@@ -6,9 +6,10 @@ export class Livre {
     prixLivre? : number;
      dateOuverture? : Date ;
      bibliotheque! : Bibliotheque;
-     images!: Image[];
      imageStr!:string;
-
+     image! : Image
+ 
+    images!: Image[];
 
     }
     
